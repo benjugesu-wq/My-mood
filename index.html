@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Misiones Mobile</title>
+  <style>
+    /* Estilos Generales */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #1a1a2e;
+      color: #ffffff;
+      padding-top: 60px; /* Espacio para que la Top Bar no tape el contenido */
+    }
+
+    /* TOP BAR COMPACTA */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background-color: #16213e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      z-index: 1000;
+    }
+
+    /* Perfil / Avatar */
+    .profile-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #e94560;
+    }
+
+    .level-badge {
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      background-color: #e94560;
+      color: #fff;
+      font-size: 9px;
+      font-weight: bold;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #16213e;
+    }
+
+    /* Menú Desplegable */
+    .missions-dropdown {
+      position: relative;
+    }
+
+    .dropdown-btn {
+      background-color: #0f3460;
+      color: #fff;
+      border: 1px solid #1f4068;
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 110%;
+      background-color: #16213e;
+      min-width: 140px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #1f4068;
+      z-index: 1001;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: #fff;
+      padding: 10px 14px;
+      text-decoration: none;
+      display: block;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #0f3460;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .content-container {
+      max-width: 420px;
+      margin: 10px auto 30px;
+      padding: 0 12px;
+    }
+
+    /* SECCIÓN DEL OSO INTERACTIVO */
+    .bear-section {
+      background-color: #16213e;
+      border: 1px solid #1f4068;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .bear-image-container {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #0f3460;
+      background-color: #0f3460;
+    }
+
+    .bear-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    /* Botones de Emociones */
+    .emotion-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-emotion {
+      background-color: #0f3460;
+      color: #fff;
+      border: 1px solid #1f4068;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-emotion:hover {
+      background-color: #e94560;
+      border-color: #e94560;
+    }
+
+    /* Mensaje Inicial */
+    .welcome-box {
+      text-align: center;
+      color: #a0a0b0;
+      padding: 20px 15px;
+      background-color: #16213e;
+      border-radius: 12px;
+      border: 1px dashed #1f4068;
+      font-size: 13px;
+    }
+
+    /* ---------------------------------------------------- */
+    /* ALINEACIÓN A LA DERECHA Y TAMAÑO COMPACTO DE MISIONES */
+    /* ---------------------------------------------------- */
+    .section-content {
+      display: none;
+      flex-direction: column;
+      align-items: flex-end; /* Alinea todo el contenido hacia la derecha */
+      width: 100%;
+    }
+
+    .section-content.active {
+      display: flex;
+    }
+
+    .title {
+      font-size: 15px;
+      margin-bottom: 10px;
+      text-align: right;
+      width: 100%;
+    }
+
+    .amor-title { color: #ff6b81; }
+    .tareas-title { color: #70a1ff; }
+    .gym-title { color: #2ed573; }
+
+    /* Tarjetas de Misiones (Más compactas y pegadas a la derecha) */
+    .mission-card {
+      background-color: #16213e;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid #1f4068;
+      width: 88%; /* No ocupa todo el ancho, dejando margen libre a la izquierda */
+      max-width: 290px; /* Tamaño ideal para pantalla de celular */
+    }
+
+    .mission-info h3 {
+      font-size: 12px;
+      margin-bottom: 2px;
+      color: #fff;
+    }
+
+    .mission-info p {
+      font-size: 10px;
+      color: #a0a0b0;
+    }
+
+    .xp-reward {
+      font-size: 10px;
+      font-weight: bold;
+      color: #ffd700;
+      white-space: nowrap;
+    }
+
+    .btn-complete {
+      background-color: #e94560;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="profile-container">
+      <img src="https://placebear.com/100/100" alt="Avatar Osito" class="avatar">
+      <span class="level-badge">5</span>
+    </div>
+
+    <div class="missions-dropdown">
+      <button class="dropdown-btn" onclick="toggleMenu()">🎯 Misiones ▼</button>
+      <div class="dropdown-content" id="missionsMenu">
+        <a href="#" onclick="cambiarSeccion('amor')">❤️ Amor</a>
+        <a href="#" onclick="cambiarSeccion('tareas')">📝 Tareas</a>
+        <a href="#" onclick="cambiarSeccion('gym')">🏋️‍♂️ Gym</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal -->
+  <main class="content-container">
+
+    <!-- SECCIÓN OSO E INTERACCIÓN -->
+    <div class="bear-section">
+      <div class="bear-image-container">
+        <img id="main-bear" src="Gemini_Generated_Image_vrp129vrp129vrp1.jpg" alt="Oso Mascota" class="bear-image">
+      </div>
+      
+      <!-- Botones de Emociones -->
+      <div class="emotion-buttons">
+        <button class="btn-emotion" onclick="cambiarEmocion('normal')">🐻 Normal</button>
+        <button class="btn-emotion" onclick="cambiarEmocion('feliz')">😀 Feliz</button>
+        <button class="btn-emotion" onclick="cambiarEmocion('enojado')">😡 Enojado</button>
+        <button class="btn-emotion" onclick="cambiarEmocion('triste')">😢 Triste</button>
+      </div>
+    </div>
+
+    <!-- Mensaje inicial cuando no hay nada seleccionado -->
+    <div id="welcome-message" class="welcome-box">
+      🎯 Elegí una categoría en el menú de arriba para ver tus misiones.
+    </div>
+
+    <!-- SECCIÓN AMOR -->
+    <section id="sec-amor" class="section-content">
+      <h2 class="title amor-title">❤️ Misiones de Amor</h2>
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Organizar cita sorpresa</h3>
+          <p>Planear una salida especial.</p>
+        </div>
+        <span class="xp-reward">+150 XP</span>
+        <button class="btn-complete">Completar</button>
+      </div>
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Detalle lindo</h3>
+          <p>Dejar una nota o mensaje especial.</p>
+        </div>
+        <span class="xp-reward">+50 XP</span>
+        <button class="btn-complete">Completar</button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN TAREAS -->
+    <section id="sec-tareas" class="section-content">
+      <h2 class="title tareas-title">📝 Tareas & Productividad</h2>
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Avanzar en el proyecto</h3>
+          <p>Codear o estudiar durante 1 hora.</p>
+        </div>
+        <span class="xp-reward">+100 XP</span>
+        <button class="btn-complete">Completar</button>
+      </div>
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Organizar la semana</h3>
+          <p>Anotar los pendientes principales.</p>
+        </div>
+        <span class="xp-reward">+40 XP</span>
+        <button class="btn-complete">Completar</button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN GYM -->
+    <section id="sec-gym" class="section-content">
+      <h2 class="title gym-title">🏋️‍♂️ Entrenamiento & Salud</h2>
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Rutina de entrenamiento</h3>
+          <p>Completar la sesión del día.</p>
+        </div>
+        <span class="xp-reward">+200 XP</span>
+        <button class="btn-complete">Completar</button>
+      </div>
+      <div class="mission-card">
+        <div class="mission-info">
+          <h3>Tomar suficiente agua</h3>
+          <p>Completar hidratación diaria.</p>
+        </div>
+        <span class="xp-reward">+30 XP</span>
+        <button class="btn-complete">Completar</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Configuración de las rutas de las imágenes para cada emoción
+    // CAMBIÁ ESTAS RUTAS por el nombre de tus imágenes locales (ej: 'imagenes/oso-feliz.png')
+    const imagenesOso = {
+      normal: "Gemini_Generated_Image_vrp129vrp129vrp1.jpg",
+      feliz: "Gemini_Generated_Image_jygm82jygm82jygm.jpg",
+      enojado: "Gemini_Generated_Image_sngpubsngpubsngp.jpg",
+      triste: "Gemini_Generated_Image_ibczkiibczkiibcz.jpg"
+    };
+
+    function cambiarEmocion(emocion) {
+      const imgOso = document.getElementById('main-bear');
+      if (imagenesOso[emocion]) {
+        imgOso.src = imagenesOso[emocion];
+      }
+    }
+
+    function toggleMenu() {
+      document.getElementById("missionsMenu").classList.toggle("show");
+    }
+
+    function cambiarSeccion(seccionId) {
+      const welcomeMsg = document.getElementById('welcome-message');
+      if (welcomeMsg) {
+        welcomeMsg.style.display = 'none';
+      }
+
+      const secciones = document.querySelectorAll('.section-content');
+      secciones.forEach(sec => sec.classList.remove('active'));
+
+      const seccionSeleccionada = document.getElementById('sec-' + seccionId);
+      if (seccionSeleccionada) {
+        seccionSeleccionada.classList.add('active');
+      }
+
+      toggleMenu();
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.matches('.dropdown-btn')) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+          const openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
