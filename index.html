@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App Misiones Mobile</title>
+  <title>My Mood - App</title>
   <style>
-    /* Estilos Generales */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -16,7 +15,82 @@
     body {
       background-color: #1a1a2e;
       color: #ffffff;
-      padding-top: 60px; /* Espacio para que la Top Bar no tape el contenido */
+      padding-top: 60px;
+    }
+
+    /* PANTALLA DE LOGIN / SELECCIÓN DE PERFIL */
+    .modal-login {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(26, 26, 46, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .login-card {
+      background-color: #16213e;
+      border: 1px solid #1f4068;
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .login-card h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #e94560;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #1f4068;
+      background-color: #0f3460;
+      color: #fff;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .btn-login {
+      width: 100%;
+      background-color: #e94560;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-user-select {
+      background-color: #0f3460;
+      color: white;
+      border: 1px solid #1f4068;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     /* TOP BAR COMPACTA */
@@ -35,11 +109,12 @@
       z-index: 1000;
     }
 
-    /* Perfil / Avatar */
     .profile-container {
       position: relative;
       display: flex;
       align-items: center;
+      gap: 8px;
+      cursor: pointer;
     }
 
     .avatar {
@@ -50,10 +125,15 @@
       border: 2px solid #e94560;
     }
 
+    .profile-name {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
     .level-badge {
       position: absolute;
       bottom: -2px;
-      right: -4px;
+      left: 24px;
       background-color: #e94560;
       color: #fff;
       font-size: 9px;
@@ -67,7 +147,6 @@
       border: 1px solid #16213e;
     }
 
-    /* Menú Desplegable */
     .missions-dropdown {
       position: relative;
     }
@@ -80,9 +159,6 @@
       font-size: 13px;
       border-radius: 6px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .dropdown-content {
@@ -92,16 +168,13 @@
       top: 110%;
       background-color: #16213e;
       min-width: 140px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid #1f4068;
       z-index: 1001;
     }
 
-    .dropdown-content.show {
-      display: block;
-    }
+    .dropdown-content.show { display: block; }
 
     .dropdown-content a {
       color: #fff;
@@ -109,21 +182,14 @@
       text-decoration: none;
       display: block;
       font-size: 13px;
-      transition: background 0.2s;
     }
 
-    .dropdown-content a:hover {
-      background-color: #0f3460;
-    }
-
-    /* CONTENEDOR PRINCIPAL */
     .content-container {
       max-width: 420px;
       margin: 10px auto 30px;
       padding: 0 12px;
     }
 
-    /* SECCIÓN DEL OSO INTERACTIVO */
     .bear-section {
       background-color: #16213e;
       border: 1px solid #1f4068;
@@ -147,10 +213,8 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.2s ease-in-out;
     }
 
-    /* Botones de Emociones */
     .emotion-buttons {
       display: flex;
       justify-content: center;
@@ -166,38 +230,16 @@
       border-radius: 20px;
       font-size: 12px;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
-    .btn-emotion:hover {
-      background-color: #e94560;
-      border-color: #e94560;
-    }
-
-    /* Mensaje Inicial */
-    .welcome-box {
-      text-align: center;
-      color: #a0a0b0;
-      padding: 20px 15px;
-      background-color: #16213e;
-      border-radius: 12px;
-      border: 1px dashed #1f4068;
-      font-size: 13px;
-    }
-
-    /* ---------------------------------------------------- */
-    /* ALINEACIÓN A LA DERECHA Y TAMAÑO COMPACTO DE MISIONES */
-    /* ---------------------------------------------------- */
     .section-content {
       display: none;
       flex-direction: column;
-      align-items: flex-end; /* Alinea todo el contenido hacia la derecha */
+      align-items: flex-end;
       width: 100%;
     }
 
-    .section-content.active {
-      display: flex;
-    }
+    .section-content.active { display: flex; }
 
     .title {
       font-size: 15px;
@@ -206,11 +248,6 @@
       width: 100%;
     }
 
-    .amor-title { color: #ff6b81; }
-    .tareas-title { color: #70a1ff; }
-    .gym-title { color: #2ed573; }
-
-    /* Tarjetas de Misiones (Más compactas y pegadas a la derecha) */
     .mission-card {
       background-color: #16213e;
       border-radius: 10px;
@@ -221,28 +258,13 @@
       justify-content: space-between;
       gap: 8px;
       border: 1px solid #1f4068;
-      width: 88%; /* No ocupa todo el ancho, dejando margen libre a la izquierda */
-      max-width: 290px; /* Tamaño ideal para pantalla de celular */
+      width: 88%;
+      max-width: 290px;
     }
 
-    .mission-info h3 {
-      font-size: 12px;
-      margin-bottom: 2px;
-      color: #fff;
-    }
-
-    .mission-info p {
-      font-size: 10px;
-      color: #a0a0b0;
-    }
-
-    .xp-reward {
-      font-size: 10px;
-      font-weight: bold;
-      color: #ffd700;
-      white-space: nowrap;
-    }
-
+    .mission-info h3 { font-size: 12px; color: #fff; }
+    .mission-info p { font-size: 10px; color: #a0a0b0; }
+    .xp-reward { font-size: 10px; font-weight: bold; color: #ffd700; }
     .btn-complete {
       background-color: #e94560;
       color: white;
@@ -256,11 +278,26 @@
 </head>
 <body>
 
-  <!-- Top Bar -->
+  <!-- MODAL DE INICIO DE SESIÓN -->
+  <div id="login-modal" class="modal-login">
+    <div class="login-card">
+      <h2>🐻 Iniciar Sesión / Perfil</h2>
+      <input type="text" id="username-input" class="login-input" placeholder="Nombre de usuario...">
+      <button class="btn-login" onclick="crearOIngresarUsuario()">Ingresar / Crear Perfil</button>
+      
+      <p style="font-size: 11px; color: #a0a0b0; margin-bottom: 8px;">O seleccioná un perfil existente:</p>
+      <div id="user-list" class="user-list">
+        <!-- Se llena con JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
   <div class="top-bar">
-    <div class="profile-container">
-      <img src="https://placebear.com/100/100" alt="Avatar Osito" class="avatar">
-      <span class="level-badge">5</span>
+    <div class="profile-container" onclick="abrirModalLogin()">
+      <img id="user-avatar" src="https://placebear.com/100/100" alt="Avatar" class="avatar">
+      <span id="user-level" class="level-badge">1</span>
+      <span id="user-name" class="profile-name">Usuario</span>
     </div>
 
     <div class="missions-dropdown">
@@ -273,16 +310,14 @@
     </div>
   </div>
 
-  <!-- Contenedor Principal -->
+  <!-- CONTENIDO PRINCIPAL -->
   <main class="content-container">
 
-    <!-- SECCIÓN OSO E INTERACCIÓN -->
     <div class="bear-section">
       <div class="bear-image-container">
-        <img id="main-bear" src="Gemini_Generated_Image_vrp129vrp129vrp1.jpg" alt="Oso Mascota" class="bear-image">
+        <img id="main-bear" src="https://placebear.com/200/200" alt="Oso Mascota" class="bear-image">
       </div>
       
-      <!-- Botones de Emociones -->
       <div class="emotion-buttons">
         <button class="btn-emotion" onclick="cambiarEmocion('normal')">🐻 Normal</button>
         <button class="btn-emotion" onclick="cambiarEmocion('feliz')">😀 Feliz</button>
@@ -291,91 +326,140 @@
       </div>
     </div>
 
-    <!-- Mensaje inicial cuando no hay nada seleccionado -->
-    <div id="welcome-message" class="welcome-box">
-      🎯 Elegí una categoría en el menú de arriba para ver tus misiones.
-    </div>
-
-    <!-- SECCIÓN AMOR -->
+    <!-- MISIONES ALINEADAS A LA DERECHA -->
     <section id="sec-amor" class="section-content">
-      <h2 class="title amor-title">❤️ Misiones de Amor</h2>
+      <h2 class="title" style="color: #ff6b81;">❤️ Misiones de Amor</h2>
       <div class="mission-card">
         <div class="mission-info">
           <h3>Organizar cita sorpresa</h3>
           <p>Planear una salida especial.</p>
         </div>
         <span class="xp-reward">+150 XP</span>
-        <button class="btn-complete">Completar</button>
-      </div>
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Detalle lindo</h3>
-          <p>Dejar una nota o mensaje especial.</p>
-        </div>
-        <span class="xp-reward">+50 XP</span>
-        <button class="btn-complete">Completar</button>
+        <button class="btn-complete" onclick="sumarXP(150)">Completar</button>
       </div>
     </section>
 
-    <!-- SECCIÓN TAREAS -->
     <section id="sec-tareas" class="section-content">
-      <h2 class="title tareas-title">📝 Tareas & Productividad</h2>
+      <h2 class="title" style="color: #70a1ff;">📝 Tareas & Productividad</h2>
       <div class="mission-card">
         <div class="mission-info">
           <h3>Avanzar en el proyecto</h3>
-          <p>Codear o estudiar durante 1 hora.</p>
+          <p>Codear o estudiar 1 hora.</p>
         </div>
         <span class="xp-reward">+100 XP</span>
-        <button class="btn-complete">Completar</button>
-      </div>
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Organizar la semana</h3>
-          <p>Anotar los pendientes principales.</p>
-        </div>
-        <span class="xp-reward">+40 XP</span>
-        <button class="btn-complete">Completar</button>
+        <button class="btn-complete" onclick="sumarXP(100)">Completar</button>
       </div>
     </section>
 
-    <!-- SECCIÓN GYM -->
     <section id="sec-gym" class="section-content">
-      <h2 class="title gym-title">🏋️‍♂️ Entrenamiento & Salud</h2>
+      <h2 class="title" style="color: #2ed573;">🏋️‍♂️ Entrenamiento</h2>
       <div class="mission-card">
         <div class="mission-info">
           <h3>Rutina de entrenamiento</h3>
           <p>Completar la sesión del día.</p>
         </div>
         <span class="xp-reward">+200 XP</span>
-        <button class="btn-complete">Completar</button>
-      </div>
-      <div class="mission-card">
-        <div class="mission-info">
-          <h3>Tomar suficiente agua</h3>
-          <p>Completar hidratación diaria.</p>
-        </div>
-        <span class="xp-reward">+30 XP</span>
-        <button class="btn-complete">Completar</button>
+        <button class="btn-complete" onclick="sumarXP(200)">Completar</button>
       </div>
     </section>
 
   </main>
 
   <script>
-    // Configuración de las rutas de las imágenes para cada emoción
-    // CAMBIÁ ESTAS RUTAS por el nombre de tus imágenes locales (ej: 'imagenes/oso-feliz.png')
+    // Imágenes del Oso
     const imagenesOso = {
-      normal: "Gemini_Generated_Image_vrp129vrp129vrp1.jpg",
-      feliz: "Gemini_Generated_Image_jygm82jygm82jygm.jpg",
-      enojado: "Gemini_Generated_Image_sngpubsngpubsngp.jpg",
-      triste: "Gemini_Generated_Image_ibczkiibczkiibcz.jpg"
+      normal: "https://placebear.com/200/200",
+      feliz: "https://placebear.com/201/201",
+      enojado: "https://placebear.com/202/202",
+      triste: "https://placebear.com/203/203"
     };
+
+    // Base de Datos Local en localStorage
+    let usuariosDB = JSON.parse(localStorage.getItem('usuariosDB')) || {
+      "Santi": { nombre: "Santi", nivel: 5, xp: 450 },
+      "Invitado": { nombre: "Invitado", nivel: 1, xp: 0 }
+    };
+
+    let usuarioActual = localStorage.getItem('usuarioActual') || null;
+
+    // Inicializar App
+    window.onload = function() {
+      actualizarListaUsuarios();
+      if (usuarioActual && usuariosDB[usuarioActual]) {
+        cargarPerfil(usuarioActual);
+        document.getElementById('login-modal').style.display = 'none';
+      } else {
+        abrirModalLogin();
+      }
+    };
+
+    function abrirModalLogin() {
+      actualizarListaUsuarios();
+      document.getElementById('login-modal').style.display = 'flex';
+    }
+
+    function actualizarListaUsuarios() {
+      const contenedor = document.getElementById('user-list');
+      contenedor.innerHTML = '';
+      
+      Object.keys(usuariosDB).forEach(nombre => {
+        const u = usuariosDB[nombre];
+        const btn = document.createElement('button');
+        btn.className = 'btn-user-select';
+        btn.innerHTML = `<span>👤 ${u.nombre}</span> <span>Nvl ${u.nivel} (${u.xp} XP)</span>`;
+        btn.onclick = () => seleccionarUsuario(u.nombre);
+        contenedor.appendChild(btn);
+      });
+    }
+
+    function crearOIngresarUsuario() {
+      const input = document.getElementById('username-input');
+      const nombre = input.value.trim();
+      
+      if (!nombre) return alert("Por favor escribí un nombre.");
+
+      if (!usuariosDB[nombre]) {
+        usuariosDB[nombre] = { nombre: nombre, nivel: 1, xp: 0 };
+        localStorage.setItem('usuariosDB', JSON.stringify(usuariosDB));
+      }
+
+      seleccionarUsuario(nombre);
+      input.value = '';
+    }
+
+    function seleccionarUsuario(nombre) {
+      usuarioActual = nombre;
+      localStorage.setItem('usuarioActual', usuarioActual);
+      cargarPerfil(usuarioActual);
+      document.getElementById('login-modal').style.display = 'none';
+    }
+
+    function cargarPerfil(nombre) {
+      const user = usuariosDB[nombre];
+      document.getElementById('user-name').innerText = user.nombre;
+      document.getElementById('user-level').innerText = user.nivel;
+    }
+
+    function sumarXP(puntos) {
+      if (!usuarioActual) return;
+      
+      const user = usuariosDB[usuarioActual];
+      user.xp += puntos;
+
+      // Cada 300 XP sube 1 nivel
+      const nuevoNivel = Math.floor(user.xp / 300) + 1;
+      if (nuevoNivel > user.nivel) {
+        alert(`🎉 ¡Felicidades ${user.nombre}! Subiste al Nivel ${nuevoNivel}!`);
+      }
+      user.nivel = nuevoNivel;
+
+      localStorage.setItem('usuariosDB', JSON.stringify(usuariosDB));
+      cargarPerfil(usuarioActual);
+    }
 
     function cambiarEmocion(emocion) {
       const imgOso = document.getElementById('main-bear');
-      if (imagenesOso[emocion]) {
-        imgOso.src = imagenesOso[emocion];
-      }
+      if (imagenesOso[emocion]) imgOso.src = imagenesOso[emocion];
     }
 
     function toggleMenu() {
@@ -383,11 +467,6 @@
     }
 
     function cambiarSeccion(seccionId) {
-      const welcomeMsg = document.getElementById('welcome-message');
-      if (welcomeMsg) {
-        welcomeMsg.style.display = 'none';
-      }
-
       const secciones = document.querySelectorAll('.section-content');
       secciones.forEach(sec => sec.classList.remove('active'));
 
@@ -395,20 +474,7 @@
       if (seccionSeleccionada) {
         seccionSeleccionada.classList.add('active');
       }
-
       toggleMenu();
-    }
-
-    window.onclick = function(event) {
-      if (!event.target.matches('.dropdown-btn')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-          const openDropdown = dropdowns[i];
-          if (openDropdown.classList.contains('show')) {
-            openDropdown.classList.remove('show');
-          }
-        }
-      }
     }
   </script>
 </body>
