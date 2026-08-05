@@ -274,6 +274,23 @@
       font-size: 10px;
       cursor: pointer;
     }
+    .action-btn {
+  background: linear-gradient(135deg, #238636, #2ea043);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(46, 160, 67, 0.5);
+}
   </style>
 </head>
 <body>
@@ -312,11 +329,14 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="content-container">
-
+      <button onclick="window.open('arbol_zootecnia.html', '_blank')">
+      🚀 Abrir Árbol de Habilidades
+    </button>
     <div class="bear-section">
       <div class="bear-image-container">
         <img id="main-bear" src="Gemini_Generated_Image_vrp129vrp129vrp1.jpg" alt="Oso Mascota" class="bear-image">
       </div>
+      
       
       <div class="emotion-buttons">
         <button class="btn-emotion" onclick="cambiarEmocion('normal')">🐻 Normal</button>
@@ -393,6 +413,15 @@
         abrirModalLogin();
       }
     };
+    function descargarProgreso() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(passed));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", "mi_progreso_zootecnia.json");
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
 
     function abrirModalLogin() {
       actualizarListaUsuarios();
