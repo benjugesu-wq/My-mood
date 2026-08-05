@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Árbol de Habilidades - Ingeniería Zootecnista</title>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --border-color: #30363d;
+      --text-color: #c9d1d9;
+      --locked-color: #484f58;
+      --available-color: #58a6ff;
+      --passed-color: #2ea043;
+      --passed-glow: rgba(46, 160, 67, 0.4);
+      --available-glow: rgba(88, 166, 255, 0.4);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #f0f6fc;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      margin-bottom: 15px;
+    }
+
+    /* Botón de Acciones */
+    .action-btn {
+      background: linear-gradient(135deg, #238636, #2ea043);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(46, 160, 67, 0.5);
+    }
+
+    /* Seccion de Progreso / Estadísticas */
+    .progress-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 15px 25px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 25px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .percentage {
+      color: var(--available-color);
+      font-size: 1.1rem;
+    }
+
+    .progress-bar-bg {
+      background-color: #21262d;
+      border-radius: 10px;
+      height: 16px;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #1f6beb, #2ea043);
+      height: 100%;
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.4s ease-in-out;
+      box-shadow: 0 0 8px rgba(46, 160, 67, 0.6);
+    }
+
+    /* Árbol y Columnas */
+    .tree-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      max-width: 100%;
+      padding-bottom: 20px;
+    }
+
+    .year-column {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 260px;
+      min-width: 260px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .year-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border-color);
+      color: #58a6ff;
+      text-transform: uppercase;
+    }
+
+    /* Nodos / Materias */
+    .node {
+      background-color: #21262d;
+      border: 2px solid var(--locked-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: not-allowed;
+      opacity: 0.5;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .node.available {
+      border-color: var(--available-color);
+      cursor: pointer;
+      opacity: 1;
+      box-shadow: 0 0 8px var(--available-glow);
+    }
+
+    .node.passed {
+      border-color: var(--passed-color);
+      background-color: #0d2d14;
+      cursor: pointer;
+      opacity: 1;
+      box-shadow: 0 0 12px var(--passed-glow);
+    }
+
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #8b949e;
+      margin-bottom: 4px;
+    }
+
+    .node-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #f0f6fc;
+    }
+
+    .node-reqs {
+      font-size: 0.75rem;
+      color: #8b949e;
+      margin-top: 6px;
+      line-height: 1.2;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .badge-locked { background: #30363d; color: #8b949e; }
+    .badge-available { background: #1f6beb; color: #ffffff; }
+    .badge-passed { background: #238636; color: #ffffff; }
+  </style>
+</head>
+<body>
+
+  <h1>Árbol de Habilidades</h1>
+  <div class="subtitle">Ingeniería Zootecnista - FCA UNLZ</div>
+
+  <!-- Botón de Descargar / Guardar Progreso -->
+  <button class="action-btn" onclick="descargarProgreso()">💾 Guardar / Exportar Mi Progreso</button>
+
+  <!-- Contenedor del Porcentaje y Barra de Progreso -->
+  <div class="progress-box">
+    <div class="progress-stats">
+      <span>Materias Aprobadas: <span id="count-passed">0</span> / <span id="count-total">0</span></span>
+      <span class="percentage" id="percent-text">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="tree-container" id="tree"></div>
+
+  <script>
+    const materias = [
+      { cod: 101, name: "Ambientación Universitaria", year: 1, req1: [], req2: [] },
+      { cod: 102, name: "Matemática I", year: 1, req1: [], req2: [] },
+      { cod: 103, name: "Química General e Inorgánica", year: 1, req1: [], req2: [] },
+      { cod: 104, name: "Botánica Morfológica", year: 1, req1: [], req2: [] },
+      { cod: 105, name: "Matemática II", year: 1, req1: [102], req2: [] },
+      { cod: 106, name: "Química Orgánica y Biológica", year: 1, req1: [103], req2: [] },
+      { cod: 107, name: "Física", year: 1, req1: [102], req2: [] },
+      { cod: 108, name: "Introducción a la Realidad Agropecuaria", year: 1, req1: [], req2: [] },
+      { cod: 109, name: "Zoología", year: 2, req1: [104], req2: [] },
+      { cod: 110, name: "Biometría", year: 2, req1: [105], req2: [102] },
+      { cod: 111, name: "Microbiología", year: 2, req1: [106], req2: [] },
+      { cod: 112, name: "Anatomía Animal", year: 2, req1: [106], req2: [] },
+      { cod: 113, name: "Ecología y Fitogeografía", year: 2, req1: [104], req2: [] },
+      { cod: 114, name: "Genética", year: 2, req1: [106, 110], req2: [105] },
+      { cod: 115, name: "Fisiología Animal", year: 2, req1: [112], req2: [106] },
+      { cod: 116, name: "Agrometeorología", year: 2, req1: [107], req2: [102] },
+      { cod: 117, name: "Problemática de Sistemas de Producción", year: 2, req1: [108], req2: [] },
+      { cod: 118, name: "Nutrición Animal", year: 3, req1: [115], req2: [112] },
+      { cod: 119, name: "Mejora y Conservación de R. Genéticos", year: 3, req1: [114], req2: [106, 110] },
+      { cod: 120, name: "Edafología", year: 3, req1: [113], req2: [103, 107] },
+      { cod: 121, name: "Fisiología Vegetal", year: 3, req1: [113], req2: [104] },
+      { cod: 122, name: "Reproducción Animal", year: 3, req1: [115], req2: [112] },
+      { cod: 123, name: "Sanidad Animal", year: 3, req1: [115], req2: [111, 112] },
+      { cod: 124, name: "Maquinaria Agrícola", year: 3, req1: [116, 117], req2: [] },
+      { cod: 125, name: "Forrajicultura", year: 3, req1: [116, 117], req2: [113, 114] },
+      { cod: 126, name: "Taller de Investigación Aplicada", year: 3, req1: [101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117], req2: [] },
+      { cod: 127, name: "Taller Prácticas Sistemas Extensivos", year: 3, req1: [117], req2: [101, 108] },
+      { cod: 128, name: "Alimentos y Alimentación Animal", year: 4, req1: [118], req2: [115] },
+      { cod: 129, name: "Manejo de Suelos y Agua", year: 4, req1: [], req2: [116] },
+      { cod: 130, name: "Bromatología y Legislación Sanitaria", year: 4, req1: [], req2: [115] },
+      { cod: 131, name: "Manejo de Recursos Forrajeros", year: 4, req1: [125], req2: [121] },
+      { cod: 132, name: "Porcinotecnia", year: 4, req1: [119, 122, 123], req2: [118] },
+      { cod: 133, name: "Avicultura", year: 4, req1: [119, 122, 123], req2: [118] },
+      { cod: 134, name: "Rumiantes Menores", year: 4, req1: [119, 122, 123], req2: [118, 125] },
+      { cod: 135, name: "Producción de Animales Granja/Fauna", year: 4, req1: [119, 122, 123], req2: [118] },
+      { cod: 136, name: "Acuicultura", year: 4, req1: [119, 122, 123], req2: [118] },
+      { cod: 137, name: "Taller Prácticas Sistemas Intensivos", year: 4, req1: [127], req2: [117] },
+      { cod: 138, name: "Producción de Bovinos de Carne", year: 4, req1: [119, 122, 123], req2: [118, 125] },
+      { cod: 139, name: "Equinotecnia", year: 4, req1: [119, 122, 123], req2: [118, 125] },
+      { cod: 140, name: "Economía Agropecuaria", year: 5, req1: [127, 132, 133, 134], req2: [117] },
+      { cod: 141, name: "Administración Agropecuaria", year: 5, req1: [137], req2: [131] },
+      { cod: 142, name: "Producción Lechera", year: 5, req1: [119, 122, 123, 128], req2: [118, 125] },
+      { cod: 143, name: "Sociología y Extensión", year: 5, req1: [127, 137], req2: [117] },
+      { cod: 144, name: "Comercialización de la Producción", year: 5, req1: [132, 133, 134, 138], req2: [131] },
+      { cod: 145, name: "Tecnología de la Prod. de Carne", year: 5, req1: [132, 133, 134, 138], req2: [128, 130] },
+      { cod: 146, name: "Taller Integración Socioeconómica", year: 5, req1: [137], req2: [127] },
+      { cod: 147, name: "Prácticas Profesionales", year: 5, req1: [101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127], req2: [] }
+    ];
+
+    let passed = JSON.parse(localStorage.getItem('zootecnia_passed')) || [];
+
+    function saveProgress() {
+      localStorage.setItem('zootecnia_passed', JSON.stringify(passed));
+    }
+
+    function isAvailable(m) {
+      if (passed.includes(m.cod)) return true;
+      const checkReqs = (reqs) => reqs.every(req => passed.includes(req));
+      return checkReqs(m.req1) && checkReqs(m.req2);
+    }
+
+    function togglePass(cod) {
+      const m = materias.find(x => x.cod === cod);
+      if (!isAvailable(m) && !passed.includes(cod)) return;
+
+      if (passed.includes(cod)) {
+        passed = passed.filter(id => id !== cod);
+      } else {
+        passed.push(cod);
+      }
+      
+      saveProgress();
+      renderTree();
+    }
+
+    function updateProgressBar() {
+      const total = materias.length;
+      const passedCount = passed.length;
+      const percentage = Math.round((passedCount / total) * 100);
+
+      document.getElementById('count-passed').innerText = passedCount;
+      document.getElementById('count-total').innerText = total;
+      document.getElementById('percent-text').innerText = `${percentage}%`;
+      document.getElementById('progress-fill').style.width = `${percentage}%`;
+    }
+
+    function descargarProgreso() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(passed));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "progreso_zootecnia.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function renderTree() {
+      updateProgressBar();
+
+      const container = document.getElementById('tree');
+      container.innerHTML = '';
+
+      const years = [1, 2, 3, 4, 5];
+
+      years.forEach(yr => {
+        const col = document.createElement('div');
+        col.className = 'year-column';
+        
+        const title = document.createElement('div');
+        title.className = 'year-title';
+        title.innerText = `${yr}° Año`;
+        col.appendChild(title);
+
+        materias.filter(m => m.year === yr).forEach(m => {
+          const isPassed = passed.includes(m.cod);
+          const available = isAvailable(m);
+
+          const node = document.createElement('div');
+          let stateClass = 'locked';
+          let badgeText = 'Bloqueada';
+
+          if (isPassed) {
+            stateClass = 'passed';
+            badgeText = 'Aprobada';
+          } else if (available) {
+            stateClass = 'available';
+            badgeText = 'Disponible';
+          }
+
+          node.className = `node ${stateClass}`;
+          node.onclick = () => togglePass(m.cod);
+
+          let reqsText = '';
+          const allReqs = [...m.req1, ...m.req2];
+          if (allReqs.length > 0) {
+            reqsText = `<div class="node-reqs">Req: ${allReqs.join(', ')}</div>`;
+          }
+
+          node.innerHTML = `
+            <div class="node-header">
+              <span>COD: ${m.cod}</span>
+              <span class="badge badge-${stateClass}">${badgeText}</span>
+            </div>
+            <div class="node-title">${m.name}</div>
+            ${reqsText}
+          `;
+
+          col.appendChild(node);
+        });
+
+        container.appendChild(col);
+      });
+    }
+
+    renderTree();
+  </script>
+</body>
+</html>
